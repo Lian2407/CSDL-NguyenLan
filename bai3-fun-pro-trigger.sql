@@ -1,185 +1,136 @@
-
 #câu 1
-CREATE FUNCTION dbo.TongDoanhThuNam1997()
-RETURNS INT
-AS
+CREATE DEFINER=`root`@`%` FUNCTION `TongDoanhThuNam1997`() RETURNS decimal(18,2)
+    DETERMINISTIC
 BEGIN
-    DECLARE @TongDoanhThu INT;
+    DECLARE TongDoanhThu DECIMAL(18, 2);
 
-    SELECT @TongDoanhThu = SUM(CT.SoLuong * MH.DonGia * (1 - CT.GiamGia))
+    SELECT SUM(CT.SoLuong * MH.DonGia * (1 - CT.GiamGia)) INTO TongDoanhThu
     FROM DonDatHang DDH
     JOIN ChiTietDDH CT ON DDH.MaDDH = CT.MaDDH
     JOIN MatHang MH ON CT.MaMH = MH.MaMH
-    WHERE DATEPART(YEAR, DDH.NgayDH) = 1997;
+    WHERE YEAR(DDH.NgayDH) = 1997;
 
-    RETURN @TongDoanhThu;
-END;
-SELECT dbo.TongDoanhThuNam1997() AS TongDoanhThu1997;
-
+    RETURN TongDoanhThu;
+END
 
 #câu 2
-CREATE FUNCTION dbo.TongDoanhThuTheoNam(@Nam INT)
-RETURNS INT
-AS
+CREATE DEFINER=`root`@`%` FUNCTION `TongDoanhThuTheoNam`(Nam INT) RETURNS decimal(18,2)
+    DETERMINISTIC
 BEGIN
-    DECLARE @TongDoanhThu INT;
+    DECLARE TongDoanhThu DECIMAL(18, 2);
 
-    SELECT @TongDoanhThu = SUM(CT.SoLuong * MH.DonGia * (1 - CT.GiamGia))
+    SELECT SUM(CT.SoLuong * MH.DonGia * (1 - CT.GiamGia)) INTO TongDoanhThu
     FROM DonDatHang DDH
     JOIN ChiTietDDH CT ON DDH.MaDDH = CT.MaDDH
     JOIN MatHang MH ON CT.MaMH = MH.MaMH
-    WHERE DATEPART(YEAR, DDH.NgayDH) = @Nam;
+    WHERE YEAR(DDH.NgayDH) = Nam;
 
-    RETURN @TongDoanhThu;
-END;
-DECLARE @Nam INT = 1997;
-SELECT dbo.TongDoanhThuTheoNam(@Nam) AS TongDoanhThu;
-
+    RETURN TongDoanhThu;
+END
 
 #câu 3
-CREATE FUNCTION dbo.TongThanhTienTheoMaDDH(@MaDDH CHAR(5))
-RETURNS INT
-AS
+CREATE DEFINER=`root`@`%` FUNCTION `TongThanhTienTheoMaDDH`(MaDDH CHAR(5)) RETURNS int
+    DETERMINISTIC
 BEGIN
-    DECLARE @TongThanhTien INT;
+    DECLARE TongThanhTien INT;
 
-    SELECT @TongThanhTien = SUM(SoLuong * DonGia * (1 - GiamGia))
+    SELECT SUM(CT.SoLuong * MH.DonGia * (1 - CT.GiamGia)) INTO TongThanhTien
     FROM ChiTietDDH CT
     JOIN MatHang MH ON CT.MaMH = MH.MaMH
-    WHERE CT.MaDDH = @MaDDH;
+    WHERE CT.MaDDH = MaDDH;
 
-    RETURN @TongThanhTien;
-END;
-DECLARE @MaDDH CHAR(5) = 'ABC01';
-SELECT dbo.TongThanhTienTheoMaDDH(@MaDDH) AS TongThanhTien;
-
+    RETURN TongThanhTien;
+END
 
 #câu 4
-CREATE FUNCTION dbo.TongDoanhThuTheoMaNV(@MaNV INT)
-RETURNS INT
-AS
+CREATE DEFINER=`root`@`%` FUNCTION `TongDoanhThuTheoMaNV`(MaNV INT) RETURNS int
+    DETERMINISTIC
 BEGIN
-    DECLARE @TongDoanhThu INT;
+    DECLARE TongDoanhThu INT;
 
-    SELECT @TongDoanhThu = SUM(CT.SoLuong * MH.DonGia * (1 - CT.GiamGia))
+    SELECT SUM(CT.SoLuong * MH.DonGia * (1 - CT.GiamGia)) INTO TongDoanhThu
     FROM DonDatHang DDH
     JOIN ChiTietDDH CT ON DDH.MaDDH = CT.MaDDH
     JOIN MatHang MH ON CT.MaMH = MH.MaMH
-    WHERE DDH.MaNV = @MaNV;
+    WHERE DDH.MaNV = MaNV;
 
-    RETURN @TongDoanhThu;
-END;
-DECLARE @MaNV INT = 1;
-SELECT dbo.TongDoanhThuTheoMaNV(@MaNV) AS TongDoanhThu;
-
+    RETURN TongDoanhThu;
+END
 
 #câu 5
+
 #cau 5.1
-CREATE PROCEDURE dbo.TongDoanhThuNam1997
-AS
+CREATE DEFINER=`root`@`%` PROCEDURE `TongDoanhThuNam1997`()
 BEGIN
     SELECT SUM(CT.SoLuong * MH.DonGia * (1 - CT.GiamGia)) AS TongDoanhThu
     FROM DonDatHang DDH
     JOIN ChiTietDDH CT ON DDH.MaDDH = CT.MaDDH
     JOIN MatHang MH ON CT.MaMH = MH.MaMH
-    WHERE DATEPART(YEAR, DDH.NgayDH) = 1997;
-END;
-EXEC dbo.TongDoanhThuNam1997;
+    WHERE YEAR(DDH.NgayDH) = 1997;
+END
 
 #câu 5.2
-CREATE PROCEDURE dbo.TongDoanhThuTheoNam
-    @Nam INT
-AS
+CREATE DEFINER=`root`@`%` PROCEDURE `TongDoanhThuTheoNam`(IN p_Nam INT)
 BEGIN
     SELECT SUM(CT.SoLuong * MH.DonGia * (1 - CT.GiamGia)) AS TongDoanhThu
     FROM DonDatHang DDH
     JOIN ChiTietDDH CT ON DDH.MaDDH = CT.MaDDH
     JOIN MatHang MH ON CT.MaMH = MH.MaMH
-    WHERE DATEPART(YEAR, DDH.NgayDH) = @Nam;
-END;
-DECLARE @Nam INT = 1998;
-EXEC dbo.TongDoanhThuTheoNam @Nam;
+    WHERE YEAR(DDH.NgayDH) = p_Nam;
+END
 
 #câu 5.3
-CREATE PROCEDURE dbo.TongThanhTienTheoMaDDH
-    @MaDDH CHAR(5)
-AS
+CREATE DEFINER=`root`@`%` PROCEDURE `TongThanhTienTheoMaDDH`(IN p_MaDDH CHAR(5))
 BEGIN
-    SELECT SUM(SoLuong * DonGia * (1 - GiamGia)) AS TongThanhTien
+    SELECT SUM(CT.SoLuong * MH.DonGia * (1 - CT.GiamGia)) AS TongThanhTien
     FROM ChiTietDDH CT
     JOIN MatHang MH ON CT.MaMH = MH.MaMH
-    WHERE CT.MaDDH = @MaDDH;
-END;
-DECLARE @MaDDH CHAR(5) = 'ABC01';
-EXEC dbo.TongThanhTienTheoMaDDH @MaDDH;
+    WHERE CT.MaDDH = p_MaDDH;
+END
 
 #câu 5.4
-CREATE PROCEDURE dbo.TongDoanhThuTheoMaNV
-    @MaNV INT
-AS
+CREATE DEFINER=`root`@`%` PROCEDURE `TongDoanhThuTheoMaNV`(IN p_MaNV INT)
 BEGIN
     SELECT SUM(CT.SoLuong * MH.DonGia * (1 - CT.GiamGia)) AS TongDoanhThu
     FROM DonDatHang DDH
     JOIN ChiTietDDH CT ON DDH.MaDDH = CT.MaDDH
     JOIN MatHang MH ON CT.MaMH = MH.MaMH
-    WHERE DDH.MaNV = @MaNV;
-END;
-DECLARE @MaNV INT = 1;
-EXEC dbo.TongDoanhThuTheoMaNV @MaNV;
-
+    WHERE DDH.MaNV = p_MaNV;
+END
 
 #câu 6
-CREATE PROCEDURE dbo.LietKeNhanVienTheoPhai
-    @Phai CHAR(1)
-AS
+CREATE DEFINER=`root`@`%` PROCEDURE `LietKeNhanVienTheoPhai`(IN p_Phai CHAR(1))
+    DETERMINISTIC
 BEGIN
     SELECT MaNV, HoLot, TenNV, DiaChiNV, NgayNViec, Phai
     FROM NhanVien
-    WHERE Phai = @Phai;
-END;
-DECLARE @Phai CHAR(1) = 'M'; -- Hoặc 'F' tùy thuộc vào phái cần tìm
-EXEC dbo.LietKeNhanVienTheoPhai @Phai;
-
+    WHERE Phai = p_Phai;
+END
 
 #câu 7
-CREATE PROCEDURE dbo.LietKeMatHangTheoMaDDH
-    @MaDDH CHAR(5)
-AS
+CREATE DEFINER=`root`@`%` PROCEDURE `LietKeMatHangTheoMaDDH`(IN p_MaDDH CHAR(5))
 BEGIN
     SELECT MH.MaMH, MH.TenMH, CT.SoLuong
     FROM MatHang MH
     JOIN ChiTietDDH CT ON MH.MaMH = CT.MaMH
-    WHERE CT.MaDDH = @MaDDH;
-END;
-DECLARE @MaDDH CHAR(5) = 'ABC01'; -- Thay thế 'ABC01' bằng mã đơn đặt hàng cần tìm
-EXEC dbo.LietKeMatHangTheoMaDDH @MaDDH;
+    WHERE CT.MaDDH = p_MaDDH;
+END
 
 #câu 9
-CREATE PROCEDURE dbo.LietKeMatHangTheoNhaCungCap
-    @MaNCC INT
-AS
+CREATE DEFINER=`root`@`%` PROCEDURE `LietKeMatHangTheoNhaCungCap`(IN p_MaNCC INT)
 BEGIN
     SELECT MH.MaMH, MH.TenMH, MH.DonViTinh, MH.DonGia
     FROM MatHang MH
-    WHERE MH.MaNCC = @MaNCC;
-END;
-DECLARE @MaNCC INT = 1; -- Thay thế 1 bằng mã nhà cung cấp cần tìm
-EXEC dbo.LietKeMatHangTheoNhaCungCap @MaNCC;
-
+    WHERE MH.MaNCC = p_MaNCC;
+END
 
 #câu 10
-CREATE PROCEDURE dbo.LietKeDonDatHangTheoKhoangThoiGian
-    @NgayBatDau DATE,
-    @NgayKetThuc DATE
-AS
+CREATE DEFINER=`root`@`%` PROCEDURE `LietKeDonDatHangTheoKhoangThoiGian`(IN p_NgayBatDau DATE, IN p_NgayKetThuc DATE)
 BEGIN
-    SELECT MaDDH, NgayDH, NgayGiao, MaKH, TenKH, MaMH, TenMH, SoLuong
+    SELECT DDH.MaDDH, DDH.NgayDH, DDH.NgayGiao, DDH.MaKH, KH.TenKH, MH.MaMH, MH.TenMH, CT.SoLuong
     FROM DonDatHang DDH
     JOIN ChiTietDDH CT ON DDH.MaDDH = CT.MaDDH
     JOIN MatHang MH ON CT.MaMH = MH.MaMH
     JOIN KhachHang KH ON DDH.MaKH = KH.MaKH
-    WHERE NgayDH >= @NgayBatDau AND NgayDH <= @NgayKetThuc;
-END;
-DECLARE @NgayBatDau DATE = '2023-01-01'; -- Thay thế '2023-01-01' bằng ngày bắt đầu cần tìm
-DECLARE @NgayKetThuc DATE = '2023-01-31'; -- Thay thế '2023-01-31' bằng ngày kết thúc cần tìm
-EXEC dbo.LietKeDonDatHangTrongKhoangNgay @NgayBatDau, @NgayKetThuc;
+    WHERE DDH.NgayDH >= p_NgayBatDau AND DDH.NgayDH <= p_NgayKetThuc;
+END
